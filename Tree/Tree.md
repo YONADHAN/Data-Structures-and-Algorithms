@@ -158,7 +158,9 @@ A general tree where each node can have at most N children. Used in applications
 
 #### **1. Complete Tree vs. Full Tree**
 - **Complete Tree** – All levels are fully filled except possibly the last, which is filled from left to right.
+- Every non-leaf has two children except for the last row and the last row is filled left->right
 - **Full Tree** – Every node has either 0 or 2 children (no node has only one child).
+- -Every non-leaf has two children and all the leafs are on the same level
 
 #### **2. Balanced Tree vs. Unbalanced Tree**
 - **Balanced Tree** – A tree where the height difference between the left and right subtrees is minimal, typically O(log N) height.
