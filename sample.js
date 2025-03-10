@@ -1,92 +1,76 @@
-// // class HashTable {
-// //     constructor(size = 10){
-// //         this.table = new Array(size)
-// //         this.size = size;
-// //     }
-
-// //     hash(key){
-// //         let hash = 0;
-// //         for(let char of key){
-// //             hash+=char.charCodeAt(0)
-// //         }
-// //         return hash%this.size
-// //     }
-
-
-// //     set(key, value){
-// //         let index = this.hash(key);
-// //         for(let bucket of this.table[index]){
-// //             if(!bucket){
-// //                 this.table[index] = [[key,value]]
-// //             }else {
-// //                 let elementInconcern = bucket.find(item = item[0]===key);
-// //                 if(elementInconcern){
-// //                     elementInconcern[1] = value;
-// //                 }else {
-// //                     this.table[index].push([key, value])
-// //                 }
-// //             }
-// //         }
-// //     }
-
-// //     print(){
-// //         console.log(this.table);
-// //     }
-// // }
-
-
-// // let Ht = new HashTable(10);
-
-// // Ht.set("name","lilly");
-// // Ht.set("place","Palakkad");
-
-
-
-// function QuickSort(arr){
-//     if(arr.length<2){
-//         return arr;
-//     }
-//     let pivot = arr[arr.length-1];
-//     let left = [];
-//     let right = [];
-//     for(let i =0;i<arr.length-1;i++){
-//         if(arr[i]<pivot){
-//             left.push(arr[i]);
-//         }else {
-//             right.push(arr[i]);
-//         }
-//     }
-//     return [...QuickSort(left),pivot,...QuickSort(right)];
-// }
-
-// const arr = [5,3,2,-6,-5];
-// console.log(QuickSort(arr));
-
-
-function mergeSort(arr){
-    if(arr.length<2){
-        return arr;
+class TrieNode {
+    constructor(){
+        this.children = {};
+        this.EndWord = false;
     }
-
-    let mid = Math.floor(arr.length/2);
-    const leftArr = arr.slice(0,mid);
-    const rightArr = arr.slice(mid);
-
-    return merge(mergeSort(leftArr),mergeSort(rightArr));
 }
 
-function merge(leftArr, rightArr){
-    let sortedArr = []
-    while(leftArr.length && rightArr.length){
-        if(leftArr[0]<rightArr[0]){
-            sortedArr.push(leftArr.shift());
-        }else {
-            sortedArr.push(rightArr.shift());
+
+class Trie{
+    constructor(){
+        this.root = new TrieNode()
+    }
+
+    insert(word){
+        let curr = this.root
+        for(let val of word){
+            if(!curr.children[val]){
+                curr.children[val] = new TrieNode()
+            }
+            curr = curr.children[val]
         }
+        curr.EndWord = true;
     }
-    return [...sortedArr,...leftArr,...rightArr]
+
+    longestPrefix(){
+        let prefix  = "";
+        let curr = this.root;
+        while(curr){
+            let keys = Object.keys(curr.children);
+            if(keys.length!==1 || curr.EndWord)break;
+            let key = keys[0];
+            prefix+=key;
+            curr = curr.children[char]
+        }
+        return prefix;
+    }
+
+    collectAllWords(prefix, curr, words=[]){
+        if(curr.EndWord){
+            words.push(prefix);
+        }
+
+        for(let key in curr.children){
+            this.collectAllWords(prefix+key,curr.children[key],words)
+        }
+
+        return words;
+    }
+
+
+
+    autocomplete(prefix){
+        let curr = this.root;
+        for(let val of prefix){
+            if(!curr.children[val]){
+                return "Not Found"
+            }
+            curr = curr.children[val];
+        }
+        return this.collectAllWords(prefix, curr);
+    }
+
+
+    search(prefix) {
+        let curr = this.root;
+
+        for(let val of prefix){
+            if(!curr.children[val]){
+                return false
+            }
+            curr = curr.children[val];
+        }
+        return curr.EndWord;
+    }
 }
 
-
-const arr = [5,3,2,-6,-5];
-console.log(mergeSort(arr));
