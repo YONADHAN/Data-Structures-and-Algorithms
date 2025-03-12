@@ -1,76 +1,121 @@
-class TrieNode {
+class MinHeap{
     constructor(){
-        this.children = {};
-        this.EndWord = false;
+        this.heap = []
+    }
+
+    getParentindex(i){
+        return Math.floor((i-1)/2);
+    }
+    getleftChildIndex(i){
+        return i*2+1
+    }
+    getrightChildIndex(i){
+        return i*2+2
+    }
+    swap(index1,index2){
+        [this.heap[index1],this.heap[index2]] = [this.heap[index2],this.heap[index1]]
+    }
+
+    insert(value){
+        this.heap.push(value);
+        this.heapifyUp(this.heap.length-1)
+    }
+
+    heapifyUp(index){
+        let parentIndex = this.getParentindex(index);
+        while(index>0 && this.heap[parentIndex]>this.heap[index]){
+            this.swap(index, parentIndex);
+            index = parentIndex;
+            parentIndex = this.getParentindex(index);
+        }
+
+    }
+
+    extractMin(){
+        if(this.heap.length === 0){
+            return 0
+        }
+        if(this.heap.length === 1){
+            return this.heap.pop()
+        }
+
+        let min = this.heap[0];
+        this.heap[0] = this.heap.pop()
+        this.heapifyDown(0);
+        return min;
+    }
+
+    heapifyDown(index){
+        let smallest = index;
+        let leftIndex = this.getleftChildIndex(index);
+        let rightIndex = this.getrightChildIndex(index);
+
+        if(leftIndex<this.heap.length && this.heap[leftIndex]<this.heap[smallest]){
+            smallest = leftIndex
+        }
+        if(rightIndex<this.heap.length && this.heap[rightIndex]<this.heap[smallest]){
+            smallest = rightIndex
+        }
+        if(smallest !== index){
+            this.swap(index, smallest);
+            this.heapifyDown(smallest);
+        }
+
+    }
+
+    heapSort(arr){
+        const minheap = new MinHeap();
+        for(let val of arr){
+            minheap.insert(val);
+        }
+        let sorted = [];
+        while(minheap.heap.length>0){
+            sorted.push(minheap.extractMin());
+        }
+        return sorted;
     }
 }
 
-
-class Trie{
+class Graph{
     constructor(){
-        this.root = new TrieNode()
+        this.adjList = new Map()
     }
 
-    insert(word){
-        let curr = this.root
-        for(let val of word){
-            if(!curr.children[val]){
-                curr.children[val] = new TrieNode()
+    addNode(node){
+        this.adjList.set(node, [])
+    }
+
+    addEdge(node1, node2, weight){
+        this.adjList.get(node1).push({node: node2, weight: weight});
+        this.adjList.get(node2).push({node: node1, weight: weight})
+    }
+
+    dijikstra(startNode){
+       let pq = new MinHeap();
+
+       let distances = new Map();
+       let previous = new Map();
+
+       for(let node of this.adjList.keys()){
+        distances.set(node, Infinity);
+        previous.set(node, null);
+       }
+
+       distances.set(startNode, 0);
+       pq.insert({node: startNode, priority: 0})
+
+       while(!pq.isEmpty()){
+        let {node} = pq.extractMin();
+
+        for(let neighbor of this.adjList.get(node)){
+            let newDist = distances.get(node)+neighbor.weight;
+            if(newDist < distances.get(neighbor.node)){
+                distances.set(neighbor.node, newDist);
+                previous.set(neighbor.node,node);
+                pq.insert({node:neighbor.node,priority:newDist})
             }
-            curr = curr.children[val]
         }
-        curr.EndWord = true;
-    }
-
-    longestPrefix(){
-        let prefix  = "";
-        let curr = this.root;
-        while(curr){
-            let keys = Object.keys(curr.children);
-            if(keys.length!==1 || curr.EndWord)break;
-            let key = keys[0];
-            prefix+=key;
-            curr = curr.children[char]
-        }
-        return prefix;
-    }
-
-    collectAllWords(prefix, curr, words=[]){
-        if(curr.EndWord){
-            words.push(prefix);
-        }
-
-        for(let key in curr.children){
-            this.collectAllWords(prefix+key,curr.children[key],words)
-        }
-
-        return words;
-    }
-
-
-
-    autocomplete(prefix){
-        let curr = this.root;
-        for(let val of prefix){
-            if(!curr.children[val]){
-                return "Not Found"
-            }
-            curr = curr.children[val];
-        }
-        return this.collectAllWords(prefix, curr);
-    }
-
-
-    search(prefix) {
-        let curr = this.root;
-
-        for(let val of prefix){
-            if(!curr.children[val]){
-                return false
-            }
-            curr = curr.children[val];
-        }
-        return curr.EndWord;
+       }
+       return distances;
     }
 }
-

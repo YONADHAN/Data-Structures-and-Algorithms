@@ -4,7 +4,7 @@ class Graph {
     }
   
     addNode(value) {
-      if (!this.adjList.has(value)) {
+      if (this.adjList.has(value)) {
         console.log("Node Already Exist...");
         return
       }
@@ -12,7 +12,7 @@ class Graph {
       console.log("Node Added")
     }
   
-    addEdges(node1, node2){
+    addEdges(node1, node2, isdirectional = false){
       if (!this.adjList.has(node1)) {
         this.addNode(node1)
       }
@@ -22,8 +22,10 @@ class Graph {
       if (!this.adjList.get(node1).includes(node2)) {
         this.adjList.get(node1).push(node2)
       }
-      if (!this.adjList.get(node2).includes(node1)) {
-        this.adjList.get(node2).push(node1)
+      if(isdirectional){
+        if (!this.adjList.get(node2).includes(node1)) {
+          this.adjList.get(node2).push(node1)
+        }
       }
     }
   
